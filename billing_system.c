@@ -1,9 +1,83 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include <stdlib.h>
 
 static int customer_id_counter = 1000;
 static int billing_counter = 1;
+
+typedef struct {
+    char name[100];
+    long long phone_number;
+    int customer_id;
+} Customer;
+
+int loadCustomerData() {
+    FILE *file = fopen("Path_of_csv_file", "r");
+    if (file == NULL) {
+        return customer_id_counter;
+    }
+    
+    char line[200];
+    int max_id = customer_id_counter;
+    
+    fgets(line, sizeof(line), file);
+    
+    while (fgets(line, sizeof(line), file)) {
+        int id;
+        sscanf(line, "%*[^,],%*[^,],%d", &id);
+        if (id >= max_id) {
+            max_id = id + 1;
+        }
+    }
+    
+    fclose(file);
+    return max_id;
+}
+
+int checkExistingCustomer(long long phone_number) {
+    FILE *file = fopen("Path_of_csv_file", "r");
+    if (file == NULL) {
+        file = fopen("Path_of_csv_file", "w");
+        if (file == NULL) {
+            printf("Error creating customer data file!\n");
+            return -1;
+        }
+        fprintf(file, "Name,Phone,CustomerID\n");
+        fclose(file);
+        return -1;
+    }
+    
+    char line[200];
+    long long stored_phone;
+    int customer_id;
+    
+    fgets(line, sizeof(line), file);
+    
+    while (fgets(line, sizeof(line), file)) {
+        char name[100];
+        sscanf(line, "%[^,],%lld,%d", name, &stored_phone, &customer_id);
+        
+        if (stored_phone == phone_number) {
+            fclose(file);
+            return customer_id;
+        }
+    }
+    
+    fclose(file);
+    return -1;
+}
+
+void saveCustomer(Customer customer) {
+    FILE *file = fopen("Path_of_csv_file", "a");
+    if (file == NULL) {
+        printf("Error opening customer data file for writing!\n");
+        return;
+    }
+    
+    fprintf(file, "%s,%lld,%d\n", customer.name, customer.phone_number, customer.customer_id);
+    fclose(file);
+}
 
 int generateCustomerID()
 {
@@ -35,6 +109,9 @@ int main()
     char name[100];
     long long phone_number; 
     int customer_id, billing_code;
+    float discount_percentage = 0.0;
+    
+    customer_id_counter = loadCustomerData();
     
     Item groceries[] = {
         {"Sugar", 40.00, "kg", 0},
@@ -71,7 +148,7 @@ int main()
     name[strcspn(name, "\n")] = 0;
 
     do {
-        printf("Customer Phone Number: ");
+        printf("Customer Phone Number (max 10 digits): ");
         scanf("%lld", &phone_number);
         
         if (phone_number < 1000000000 || phone_number > 9999999999) {
@@ -79,7 +156,21 @@ int main()
         }
     } while (phone_number < 1000000000 || phone_number > 9999999999);
 
-    customer_id = generateCustomerID();
+    int existing_id = checkExistingCustomer(phone_number);
+    
+    if (existing_id != -1) {
+        customer_id = existing_id;
+        printf("Welcome back! Using your existing Customer ID: %d\n", customer_id);
+    } else {
+        customer_id = generateCustomerID();
+        // Save new customer
+        Customer new_customer;
+        strcpy(new_customer.name, name);
+        new_customer.phone_number = phone_number;
+        new_customer.customer_id = customer_id;
+        saveCustomer(new_customer);
+    }
+    
     billing_code = generateBillingCode();
 
     printf("\nCustomer Registered: \n");
