@@ -22,8 +22,12 @@ The program now saves the generated invoices to a file, allowing you to:
    git clone https://github.com/your-username/billing-system-c.git
    cd billing-system-c
 2. Compile the code:
+   ```
    gcc Billing_System.c -o billing_system
 3. Run the program:
+   ```
    ./billing_system
+
+💡 Make sure you have GCC installed.
 
 
