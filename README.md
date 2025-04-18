@@ -6,14 +6,12 @@ Console billing system in C that creates invoices during program execution and s
 
 - Add items to the bill.
 - Generate invoices with itemized details.
-- Store transaction data (in a file) for future reference.
 - Simple and efficient menu-driven interface.
 
 ## 📂 Data Handling
 
-The program now saves the generated invoices to a file, allowing you to:
-- View saved transaction history.
-- Retrieve previous invoices on subsequent runs.
+The program now saves the generated customer details to a file, allowing you to:
+- Retrieve previous customer data on subsequent runs.
 
 ## ▶️ How to Run
 
