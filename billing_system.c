@@ -272,7 +272,6 @@ int main()
     printf("Total Bill Amount: Rs. %d\n", total_bill);
     printf("-------------------\n");
     
-    float discount_percentage = 0.0;
     float discount_amount = 0.0;
     float final_amount = 0.0;
     
